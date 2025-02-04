@@ -9,7 +9,7 @@ import mongoose from 'mongoose';
 import costRoutes from './routes/costRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 
-const URL = "mongodb+srv://katzirziv:CrCSJlK46P4jJl3g@cluster0.pgid0.mongodb.net/";
+const URL = "mongodb+srv://katzirziv:CrCSJlK46P4jJl3g@cluster0.pgid0.mongodb.net/cost-manager";
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -26,4 +26,4 @@ app.use('/api', userRoutes);
 // Start server
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 
-export default app;
+export default app
