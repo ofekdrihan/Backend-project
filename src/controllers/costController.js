@@ -8,21 +8,46 @@ import Cost from '../models/costs.js';
 import User from '../models/users.js';
 
 export const addCost = async (req, res) => {
-  try {
-    const { description, category, sum, userid, created_at } = req.body;
-    const allowedCategories = ['food', 'health', 'housing', 'sport', 'education'];
-    if (!allowedCategories.includes(category)) {
-      return res.status(400).json({ error: 'Invalid category' });
+    try {
+        const { description, category, sum, userid } = req.body;
+        const created_at = req.body.created_at || new Date();
+
+        // Validation
+        const allowedCategories = ['food', 'health', 'housing', 'sport', 'education'];
+        if (!allowedCategories.includes(category)) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+        if (!description || !category || !sum || !userid) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Create new cost
+        const newCost = new Cost({
+            description,
+            category,
+            sum,
+            userid,
+            created_at
+        });
+
+        // Save cost
+        const savedCost = await newCost.save();
+
+        // Format date keys for updating computed fields
+        const yearMonth = `${created_at.getFullYear()}-${String(created_at.getMonth() + 1).padStart(2, '0')}`;
+        const year = created_at.getFullYear().toString();
+
+        // Update user's computed fields
+        await User.findOneAndUpdate(
+            { id: userid },
+            { $inc: { total: sum } },
+            { new: true }
+        );
+
+        res.status(201).json(savedCost);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
     }
-    if (!description || !category || !sum || !userid) {
-      return res.status(400).json({ error: 'Missing required fields' });
-    }
-    const newCost = new Cost({ description, category, sum, userid, created_at: Date.now() });
-    const savedCost = await newCost.save();
-    res.status(201).json(savedCost);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
 };
 
 export const getReport = async (req, res) => {
