@@ -31,6 +31,11 @@ export const addCost = async (req, res) => {
             return res.status(400).json({ error: 'Missing required fields' });
         }
 
+        // Validate that the sum is greater than zero to prevent invalid cost entries
+        if (sum <= 0) {
+            return res.status(400).json({ error: 'Sum must be greater than zero' });
+        }
+
         // Create a new cost entry object
         const newCost = new Cost({
             description,
