@@ -128,8 +128,7 @@ export const getReport = async (req, res) => {
                 error: 'Invalid year or month format'
             });
         }
-
-        // First, check if user exists
+        // First check if user exists before proceeding
         const userExists = await User.findOne({ id: userId });
         if (!userExists) {
             return res.status(404).json({
@@ -147,6 +146,14 @@ export const getReport = async (req, res) => {
             created_at: { $gte: startDate, $lte: endDate } // Filter by date range
         });
 
+        // Check if any costs were found for the user
+        if (!costs || costs.length === 0) {
+            return res.status(404).json({
+                error: 'User not found or no data available',
+                details: `No costs found for user ${userId} in ${monthNum}/${yearNum}`
+            });
+        }
+
         // Initialize an object to categorize costs
         const categories = {
             food: [],
@@ -156,18 +163,17 @@ export const getReport = async (req, res) => {
             education: []
         };
 
-        // Iterate through all retrieved costs and group them by category
+        // Rest of the function remains the same...
         costs.forEach(cost => {
             if (categories.hasOwnProperty(cost.category)) {
                 categories[cost.category].push({
-                    sum: cost.sum, // The amount spent
-                    description: cost.description, // Description of the expense
-                    day: new Date(cost.created_at).getDate() // Extract the day of the expense
+                    sum: cost.sum,
+                    description: cost.description,
+                    day: new Date(cost.created_at).getDate()
                 });
             }
         });
 
-        // Format the response object with structured data
         const response = {
             userid: userId,
             year: yearNum,
@@ -177,11 +183,9 @@ export const getReport = async (req, res) => {
             }))
         };
 
-        // Send the response with the formatted report
         res.json(response);
 
     } catch (error) {
-        // Log the error and send a response indicating an internal server error
         console.error('Error generating monthly report:', error);
         res.status(500).json({
             error: 'Internal server error while generating monthly report',
