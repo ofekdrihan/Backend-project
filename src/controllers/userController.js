@@ -1,8 +1,8 @@
 /**
- * Controller for handling user-related operations.
+ * @fileoverview Controller handling all user-related operations in the cost management system.
+ * Includes functions for user creation, retrieval, and developer information.
  * @module userController
- * @description Manages user operations including fetching user details, creating users,
- * and retrieving developer information.
+ * @requires ../models/users
  */
 
 import User from '../models/users.js';

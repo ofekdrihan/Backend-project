@@ -1,9 +1,11 @@
 /**
- * Express server configuration
- * @module serverConfig
- * @description Initializes Express server, connects to MongoDB, sets up middleware and routes
+ * @fileoverview Main application entry point that sets up Express server and database connection.
+ * Configures server middleware, connects to MongoDB, and sets up API routes.
+ * @module app
  * @requires express
  * @requires mongoose
+ * @requires ./routes/costRoutes
+ * @requires ./routes/userRoutes
  */
 
 import express from 'express';

@@ -1,8 +1,8 @@
 /**
- * Controller for handling cost-related operations.
- * Includes functions for adding costs and generating monthly reports.
+ * @fileoverview Controller handling all cost-related operations in the cost management system.
+ * Includes functions for adding new costs and generating detailed monthly reports.
+ * Manages data validation, user verification, and cost categorization.
  * @module costController
- * @description Handles the creation and retrieval of cost entries, including monthly reports.
  * @requires ../models/costs
  * @requires ../models/users
  */
