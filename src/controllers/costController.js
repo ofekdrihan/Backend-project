@@ -67,7 +67,7 @@ export const addCost = async (req, res) => {
  * Generates a monthly report of costs for a user.
  * @param {import('express').Request} req - Express request object containing user ID, year, and month as query parameters.
  * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends a structured report of costs grouped by category or an error response.
+ * @returns {Promise<e.Response<any, Record<string, any>>>} Sends a structured report of costs grouped by category or an error response.
  */
 export const getReport = async (req, res) => {
     try {

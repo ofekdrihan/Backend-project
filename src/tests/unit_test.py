@@ -1,15 +1,29 @@
 import unittest
 import requests
-import json
 from datetime import datetime, timedelta
 
 class TestCostManagerAPI(unittest.TestCase):
-    BASE_URL = "http://localhost:3000/api"  # Change this to your API's base URL
+    BASE_URL = "http://localhost:3000/api"
     TEST_USER_ID = "123123"
 
     def setUp(self):
         """Set up test case - runs before each test"""
-        # You might want to add setup logic here, like ensuring test user exists
+        # Create test user
+        self.test_user = {
+            "id": self.TEST_USER_ID,
+            "first_name": "mosh",
+            "last_name": "israeli",
+            "birthday": "1990-01-01",  # Using a default birthday
+            "marital_status": "single"
+        }
+
+        # Create the test user
+        try:
+            requests.post(f"{self.BASE_URL}/adduser", json=self.test_user)
+        except requests.exceptions.RequestException as e:
+            print(f"Setup error: {e}")
+
+        # Setup test cost
         self.test_cost = {
             "description": "Test cost",
             "category": "food",
@@ -20,15 +34,15 @@ class TestCostManagerAPI(unittest.TestCase):
     def test_about_endpoint(self):
         """Test GET /api/about endpoint"""
         response = requests.get(f"{self.BASE_URL}/about")
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Verify response is a list of developers
         self.assertIsInstance(data, list)
         self.assertTrue(len(data) > 0)
-        
-        # Check each developer has required fields only
+
+        # Check each developer has required fields
         for developer in data:
             self.assertIn('first_name', developer)
             self.assertIn('last_name', developer)
@@ -36,17 +50,17 @@ class TestCostManagerAPI(unittest.TestCase):
 
     def test_get_user_details(self):
         """Test GET /api/users/:id endpoint"""
-        # Test existing user
+        # Test existing user (Mosh Israeli)
         response = requests.get(f"{self.BASE_URL}/users/{self.TEST_USER_ID}")
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
-        # Verify response structure
-        self.assertIn('id', data)
-        self.assertIn('first_name', data)
-        self.assertIn('last_name', data)
+
+        # Verify response structure and content
+        self.assertEqual(data['id'], self.TEST_USER_ID)
+        self.assertEqual(data['first_name'], "mosh")
+        self.assertEqual(data['last_name'], "israeli")
         self.assertIn('total', data)
-        
+
         # Test non-existing user
         response = requests.get(f"{self.BASE_URL}/users/999999")
         self.assertEqual(response.status_code, 404)
@@ -61,7 +75,7 @@ class TestCostManagerAPI(unittest.TestCase):
         )
         self.assertEqual(response.status_code, 201)
         data = response.json()
-        
+
         # Verify response contains all cost details
         self.assertEqual(data['description'], self.test_cost['description'])
         self.assertEqual(data['category'], self.test_cost['category'])
@@ -98,7 +112,7 @@ class TestCostManagerAPI(unittest.TestCase):
 
     def test_monthly_report(self):
         """Test GET /api/report endpoint"""
-        # Add some test costs first
+        # Add some test costs for Mosh
         test_costs = [
             {
                 "description": "Groceries",
@@ -119,14 +133,14 @@ class TestCostManagerAPI(unittest.TestCase):
                 "userid": self.TEST_USER_ID
             }
         ]
-        
+
         for cost in test_costs:
             requests.post(f"{self.BASE_URL}/add", json=cost)
 
         # Test getting report
         current_year = datetime.now().year
         current_month = datetime.now().month
-        
+
         response = requests.get(
             f"{self.BASE_URL}/report",
             params={
@@ -135,22 +149,22 @@ class TestCostManagerAPI(unittest.TestCase):
                 "month": current_month
             }
         )
-        
+
         self.assertEqual(response.status_code, 200)
         data = response.json()
-        
+
         # Verify report structure
         self.assertEqual(data['userid'], self.TEST_USER_ID)
         self.assertEqual(data['year'], current_year)
         self.assertEqual(data['month'], current_month)
         self.assertIsInstance(data['costs'], list)
-        
+
         # Verify all categories are present
         categories = set()
         for cost_category in data['costs']:
             category = list(cost_category.keys())[0]
             categories.add(category)
-        
+
         expected_categories = {'food', 'health', 'housing', 'sport', 'education'}
         self.assertEqual(categories, expected_categories)
 
@@ -175,11 +189,11 @@ class TestCostManagerAPI(unittest.TestCase):
             headers={'Content-Type': 'application/json'}
         )
         self.assertEqual(response.status_code, 400)
-        
+
         # Test missing parameters in report
         response = requests.get(f"{self.BASE_URL}/report")
         self.assertEqual(response.status_code, 400)
-        
+
         # Test invalid user ID format
         response = requests.get(f"{self.BASE_URL}/users/invalid_id")
         self.assertEqual(response.status_code, 404)
@@ -195,13 +209,13 @@ class TestCostManagerAPI(unittest.TestCase):
             "userid": self.TEST_USER_ID,
             "created_at": next_month.isoformat()
         }
-        
+
         requests.post(f"{self.BASE_URL}/add", json=future_cost)
-        
+
         # Get current month's report
         current_year = datetime.now().year
         current_month = datetime.now().month
-        
+
         response = requests.get(
             f"{self.BASE_URL}/report",
             params={
@@ -210,17 +224,17 @@ class TestCostManagerAPI(unittest.TestCase):
                 "month": current_month
             }
         )
-        
+
         data = response.json()
         food_costs = next(
-            category['food'] 
-            for category in data['costs'] 
+            category['food']
+            for category in data['costs']
             if 'food' in category
         )
-        
+
         # Verify future cost is not in current month's report
         future_cost_present = any(
-            cost['description'] == "Future cost" 
+            cost['description'] == "Future cost"
             for cost in food_costs
         )
         self.assertFalse(future_cost_present)
