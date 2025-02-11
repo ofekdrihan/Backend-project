@@ -8,7 +8,6 @@
 import Cost from '../models/costs.js';
 import User from '../models/users.js';
 
-
 /**
  * Adds a new cost entry for a user and updates their total spending.
  * @async
@@ -85,7 +84,7 @@ export const addCost = async (req, res) => {
         // Send the response with the newly created cost entry
         res.status(201).json(savedCost);
     } catch (err) {
-        // Handle any unexpected errors
+        // Handle unexpected errors
         res.status(500).json({ error: err.message });
     }
 };

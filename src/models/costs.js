@@ -18,7 +18,7 @@ import mongoose from "mongoose";
  * @type {mongoose.Schema}
  */
 const CostSchema = new mongoose.Schema({
-    // Description of the expense (required)
+    // Description of the expense
     description: {
         type: String,
         required: true,
@@ -29,7 +29,7 @@ const CostSchema = new mongoose.Schema({
         type: String, 
         enum: ['food', 'health', 'housing', 'sport', 'education'],
         required: true,
-        lowercase: true // Ensures consistency in category storage
+        lowercase: true //consistency in category storage
     },
     sum: { type: Number, required: true },// Amount of the expense (required, must be positive)
     userid: { type: String, required: true }, // Reference to the user who created the cost
