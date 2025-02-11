@@ -25,7 +25,7 @@ const UserSchema = new mongoose.Schema({
     first_name: { type: String, required: true }, // User's first name
     last_name: { type: String, required: true }, // User's last name
     birthday: { type: Date, required: true,default:new Date('2001-1-01')}, // Date of birth in ISO format (YYYY-MM-DD)
-    marital_status: { type: String, required: true,default:'Single' }, // Marital status (e.g., Single, Married, Divorced)
+    marital_status: { type: String, required: true,default:'Single' }, // Marital status (Single, Married, Divorced)
     total: { type: Number, default: 0 }, // User's total balance, default value is 0
 });
 
