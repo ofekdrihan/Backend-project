@@ -1,26 +1,38 @@
+/**
+ * @fileoverview Defines the Cost model schema and exports the Mongoose model.
+ * @module models/costs
+ */
 import mongoose from "mongoose";
 
 /**
  * @typedef {Object} Cost
- * @property {string} description - A short description of the cost (required).
- * @property {string} category - The category of the cost, must be one of: 'food', 'health', 'housing', 'sport', 'education' (required).
- * @property {number} sum - The total amount of the cost (required).
- * @property {string} userid - The ID of the user associated with the cost (required).
- * @property {Date} [created_at] - The date when the cost was created (default: current date).
+ * @property {string} description - A short description of the cost
+ * @property {('food'|'health'|'housing'|'sport'|'education')} category - The category of the cost
+ * @property {number} sum - The total amount of the cost
+ * @property {string} userid - The ID of the user associated with the cost
+ * @property {Date} [created_at] - The date when the cost was created
  */
 
-/* 
- * Defines the schema for the "costs" collection in MongoDB.
+/**
+ * Mongoose schema definition for costs.
+ * @type {mongoose.Schema}
  */
 const CostSchema = new mongoose.Schema({
-    description: { type: String, required: true }, // A short description of the expense
+    // Description of the expense (required)
+    description: {
+        type: String,
+        required: true,
+        trim: true // Removes whitespace from both ends
+    },
+    // Category of the expense
     category: { 
         type: String, 
-        enum: ['food', 'health', 'housing', 'sport', 'education'], // Allowed categories
-        required: true 
+        enum: ['food', 'health', 'housing', 'sport', 'education'],
+        required: true,
+        lowercase: true // Ensures consistency in category storage
     },
-    sum: { type: Number, required: true }, // The total cost amount
-    userid: { type: String, required: true }, // User ID associated with the cost
+    sum: { type: Number, required: true },// Amount of the expense (required, must be positive)
+    userid: { type: String, required: true }, // Reference to the user who created the cost
     created_at: { type: Date, default: Date.now }, // Timestamp of cost creation, default is current date
 });
 

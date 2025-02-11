@@ -1,33 +1,39 @@
 /**
- * Express router for user management operations
- * @module userRouter
+ * @fileoverview Express router configuration for user-related endpoints.
+ * @module routes/userRoutes
+ * @requires express
+ * @requires ../controllers/userController
  */
 import express from 'express';
-// Import user controller functions
 import { getUserDetails, getDevelopers, createUser } from '../controllers/userController.js';
 
 // Initialize Express router
 const router = express.Router();
 
 /**
- * GET /about - Retrieve developers information
- * @route GET /about
- * @uses getDevelopers - Controller for developers data
+ * GET /api/about
+ * @description Endpoint to retrieve developers information
+ * @returns {Array} JSON array containing developers' first and last names
  */
 router.get('/about', getDevelopers);
 
 /**
- * GET /users/:id - Get specific user information
- * @route GET /users/:id
- * @param {string} id - User ID
- * @uses getUserDetails - Controller for user details
+ * GET /api/users/:id
+ * @description Endpoint to retrieve specific user information
+ * @param {string} id - User ID as URL parameter
+ * @returns {Object} JSON containing user details (id, first_name, last_name, total)
  */
 router.get('/users/:id', getUserDetails);
 
 /**
- * POST /adduser - Create new user
- * @route POST /adduser
- * @uses createUser - Controller for user creation
+ * POST /api/adduser
+ * @description Endpoint to create a new user
+ * @param {string} id - Unique identifier for the user
+ * @param {string} first_name - User's first name
+ * @param {string} last_name - User's last name
+ * @param {string} birthday - User's date of birth (YYYY-MM-DD format)
+ * @param {string} marital_status - User's marital status
+ * @returns {Object} JSON containing the created user data or error message
  */
 router.post('/adduser', createUser);
 

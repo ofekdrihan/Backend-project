@@ -1,22 +1,49 @@
 /**
  * Controller for handling cost-related operations.
  * Includes functions for adding costs and generating monthly reports.
+ * @module costController
+ * @description Handles the creation and retrieval of cost entries, including monthly reports.
  */
 
 import Cost from '../models/costs.js';
 import User from '../models/users.js';
 
+
 /**
- * Adds a new cost entry for a user.
- * @param {import('express').Request} req - Express request object containing cost details in the body.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends the saved cost data or an error response.
+ * Adds a new cost entry for a user and updates their total spending.
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {Object} req.body - Request body containing cost details
+ * @param {string} req.body.description - Description of the cost
+ * @param {string} req.body.category - Category of the cost (food, health, housing, sport, education)
+ * @param {number} req.body.sum - Amount of the cost
+ * @param {string} req.body.userid - ID of the user adding the cost
+ * @param {Date} [req.body.created_at] - Optional creation date, defaults to current date
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
  */
 export const addCost = async (req, res) => {
     try {
         // Extracting cost details from the request body
         const { description, category, sum, userid } = req.body;
-        const created_at = req.body.created_at || new Date(); // Use provided date or current date
+        // Validate and process the created_at date
+        let created_at;
+        if (req.body.created_at) {
+            const providedDate = new Date(req.body.created_at);
+
+            // Check if the date is valid and has a valid month (1-12)
+            if (!isNaN(providedDate.getTime()) &&
+                providedDate.getMonth() >= 1 &&
+                providedDate.getMonth() <= 12) {
+                created_at = providedDate;
+            } else {
+                // If date is invalid, use current date
+                created_at = new Date();
+            }
+        } else {
+            // If no date provided, use current date
+            created_at = new Date();
+        }
 
         // Define allowed categories for validation
         const allowedCategories = ['food', 'health', 'housing', 'sport', 'education'];
@@ -64,10 +91,15 @@ export const addCost = async (req, res) => {
 };
 
 /**
- * Generates a monthly report of costs for a user.
- * @param {import('express').Request} req - Express request object containing user ID, year, and month as query parameters.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<e.Response<any, Record<string, any>>>} Sends a structured report of costs grouped by category or an error response.
+ * Generates a monthly report of costs for a specific user.
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {Object} req.query - Query parameters
+ * @param {string} req.query.id - User ID
+ * @param {string} req.query.year - Year for the report
+ * @param {string} req.query.month - Month for the report (1-12)
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
  */
 export const getReport = async (req, res) => {
     try {

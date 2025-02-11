@@ -1,16 +1,21 @@
 /**
  * Controller for handling user-related operations.
- * Includes functions for fetching user details, creating a user, and retrieving developer information.
+ * @module userController
+ * @description Manages user operations including fetching user details, creating users,
+ * and retrieving developer information.
  */
 
 import User from '../models/users.js';
-import Cost from '../models/costs.js';
 
 /**
- * Fetches user details by ID.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends user details or an error response.
+ * Retrieves user details by their ID.
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {Object} req.params - URL parameters
+ * @param {string} req.params.id - User ID to fetch
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
+ * containing user details or error message
  */
 export const getUserDetails = async (req, res) => {
   try {
@@ -23,11 +28,11 @@ export const getUserDetails = async (req, res) => {
       }
 
       // Return user details
-      res.status(200).json({
-          id: user.id,
-          first_name: user.first_name,
-          last_name: user.last_name,
-          total: user.total
+      return res.status(200).json({
+          id: user.get('id'),
+          first_name: user.get('first_name'),
+          last_name: user.get('last_name'),
+          total: user.get('total')
       });
   } catch (err) {
       // Handle server error
@@ -36,10 +41,18 @@ export const getUserDetails = async (req, res) => {
 };
 
 /**
- * Creates a new user in the database.
- * @param {import('express').Request} req - Express request object containing user data in the body.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends created user data or an error response.
+ * Creates a new user in the system.
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {Object} req.body - Request body containing user data
+ * @param {string} req.body.id - Unique identifier for the user
+ * @param {string} req.body.first_name - User's first name
+ * @param {string} req.body.last_name - User's last name
+ * @param {string} req.body.birthday - User's date of birth (YYYY-MM-DD format)
+ * @param {string} req.body.marital_status - User's marital status
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
+ * containing created user data or error message
  */
 export const createUser = async (req, res) => {
   // Extract user details from request body
@@ -57,6 +70,7 @@ export const createUser = async (req, res) => {
       last_name,
       birthday,
       marital_status,
+      // total will default to 0 as defined in the schema
   });
 
   try {
@@ -70,10 +84,12 @@ export const createUser = async (req, res) => {
 };
 
 /**
- * Retrieves the list of developers working on this project.
- * @param {import('express').Request} req - Express request object.
- * @param {import('express').Response} res - Express response object.
- * @returns {Promise<void>} Sends an array of developer objects.
+ * Retrieves information about the development team.
+ * @async
+ * @param {import('express').Request} req - Express request object
+ * @param {import('express').Response} res - Express response object
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
+ * containing array of developer information
  */
 export const getDevelopers = async (req, res) => {
   try {
@@ -83,7 +99,7 @@ export const getDevelopers = async (req, res) => {
           { first_name: 'Ziv', last_name: 'Katzir' }
       ];
 
-      // Send the team details
+      // Return team information
       res.status(200).json(team);
   } catch (error) {
       // Handle server error

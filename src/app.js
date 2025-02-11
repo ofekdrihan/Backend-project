@@ -49,5 +49,4 @@ app.use('/api', userRoutes);    // Mount user management routes
  */
 app.listen(PORT, () => console.log(`Running on port ${PORT}`));
 
-// Export app instance for testing or external use
-export default app;
+
