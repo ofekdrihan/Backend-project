@@ -108,7 +108,7 @@ class TestCostManagerAPI(unittest.TestCase):
             f"{self.BASE_URL}/add",
             json={"description": "Test cost"}
         )
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 400)
         self.assertIn('error', response.json())
 
     def test_monthly_report(self):
