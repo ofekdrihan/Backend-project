@@ -3,8 +3,6 @@
  * Includes functions for adding costs and generating monthly reports.
  * @module costController
  * @description Handles the creation and retrieval of cost entries, including monthly reports.
- * @requires ../models/costs
- * @requires ../models/users
  */
 
 import Cost from '../models/costs.js';
@@ -18,37 +16,15 @@ import User from '../models/users.js';
  * @param {string} req.body.description - Description of the cost
  * @param {string} req.body.category - Category of the cost (food, health, housing, sport, education)
  * @param {number} req.body.sum - Amount of the cost
- * @param {string|number} req.body.userid - ID of the user adding the cost
+ * @param {string} req.body.userid - ID of the user adding the cost
  * @param {Date} [req.body.created_at] - Optional creation date, defaults to current date
  * @param {import('express').Response} res - Express response object
- * @returns {Promise<import('express').Response>} Express response with one of the following:
- *  - 201: Successfully created cost entry
- *  - 400: Error when required parameters are missing or invalid
- *  - 404: Error when user is not found
- *  - 500: Error when server encounters an internal error
+ * @returns {Promise<import('express').Response>} Promise resolving to Express response
  */
 export const addCost = async (req, res) => {
     try {
         // Extracting cost details from the request body
         const { description, category, sum, userid } = req.body;
-
-        // Validate that all required fields are present
-        if (!description || !category || !sum || !userid) {
-            return res.status(400).json({ error: 'Missing required fields' });
-        }
-
-        // Define allowed categories for validation
-        const allowedCategories = ['food', 'health', 'housing', 'sport', 'education'];
-
-        // Check if category is valid
-        if (!allowedCategories.includes(category)) {
-            return res.status(400).json({ error: 'Invalid category' });
-        }
-
-        // Validate that the sum is greater than zero to prevent invalid cost entries
-        if (sum <= 0) {
-            return res.status(400).json({ error: 'Sum must be greater than zero' });
-        }
 
         // Check if user exists before proceeding
         const userExists = await User.findOne({ id: userid });
@@ -61,7 +37,7 @@ export const addCost = async (req, res) => {
         if (req.body.created_at) {
             const providedDate = new Date(req.body.created_at);
 
-            // Check if the date is valid and has a valid month (0-11)
+            // Check if the date is valid and has a valid month (1-12)
             if (!isNaN(providedDate.getTime()) &&
                 providedDate.getMonth() >= 0 &&
                 providedDate.getMonth() <= 11) {
@@ -73,6 +49,24 @@ export const addCost = async (req, res) => {
         } else {
             // If no date provided, use current date
             created_at = new Date();
+        }
+
+        // Define allowed categories for validation
+        const allowedCategories = ['food', 'health', 'housing', 'sport', 'education'];
+
+        // Check if category is valid
+        if (!allowedCategories.includes(category)) {
+            return res.status(400).json({ error: 'Invalid category' });
+        }
+
+        // Validate that all required fields are present
+        if (!description || !category || !sum || !userid) {
+            return res.status(400).json({ error: 'Missing required fields' });
+        }
+
+        // Validate that the sum is greater than zero to prevent invalid cost entries
+        if (sum <= 0) {
+            return res.status(400).json({ error: 'Sum must be greater than zero' });
         }
 
         // Create a new cost entry object
@@ -107,7 +101,7 @@ export const addCost = async (req, res) => {
  * @async
  * @param {import('express').Request} req - Express request object
  * @param {Object} req.query - Query parameters
- * @param {string|number} req.query.id - User ID
+ * @param {string} req.query.id - User ID
  * @param {string} req.query.year - Year for the report
  * @param {string} req.query.month - Month for the report (1-12)
  * @param {import('express').Response} res - Express response object
