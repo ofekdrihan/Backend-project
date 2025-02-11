@@ -128,14 +128,7 @@ export const getReport = async (req, res) => {
                 error: 'Invalid year or month format'
             });
         }
-        // First check if user exists before proceeding
-        const userExists = await User.findOne({ id: userId });
-        if (!userExists) {
-            return res.status(404).json({
-                error: 'User not found',
-                details: `User with ID ${userId} does not exist in the system`
-            });
-        }
+
         // Define the start and end dates for the requested month
         const startDate = new Date(yearNum, monthNum - 1, 1); // First day of the month
         const endDate = new Date(yearNum, monthNum, 0, 23, 59, 59, 999); // Last day of the month
@@ -155,17 +148,18 @@ export const getReport = async (req, res) => {
             education: []
         };
 
-        // Rest of the function remains the same...
+        // Iterate through all retrieved costs and group them by category
         costs.forEach(cost => {
             if (categories.hasOwnProperty(cost.category)) {
                 categories[cost.category].push({
-                    sum: cost.sum,
-                    description: cost.description,
-                    day: new Date(cost.created_at).getDate()
+                    sum: cost.sum, // The amount spent
+                    description: cost.description, // Description of the expense
+                    day: new Date(cost.created_at).getDate() // Extract the day of the expense
                 });
             }
         });
 
+        // Format the response object with structured data
         const response = {
             userid: userId,
             year: yearNum,
@@ -175,9 +169,11 @@ export const getReport = async (req, res) => {
             }))
         };
 
+        // Send the response with the formatted report
         res.json(response);
 
     } catch (error) {
+        // Log the error and send a response indicating an internal server error
         console.error('Error generating monthly report:', error);
         res.status(500).json({
             error: 'Internal server error while generating monthly report',
