@@ -25,6 +25,13 @@ export const addCost = async (req, res) => {
     try {
         // Extracting cost details from the request body
         const { description, category, sum, userid } = req.body;
+
+        // Check if user exists before proceeding
+        const userExists = await User.findOne({ id: userid });
+        if (!userExists) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
         // Validate and process the created_at date
         let created_at;
         if (req.body.created_at) {
@@ -115,6 +122,12 @@ export const getReport = async (req, res) => {
             return res.status(400).json({
                 error: 'Missing required parameters. Please provide id, year, and month.'
             });
+        }
+
+        // Check if user exists before proceeding
+        const userExists = await User.findOne({ id: id });
+        if (!userExists) {
+            return res.status(404).json({ error: 'User not found' });
         }
 
         // Convert parameters to the appropriate data types
