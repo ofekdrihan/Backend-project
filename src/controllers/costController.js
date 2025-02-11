@@ -146,14 +146,6 @@ export const getReport = async (req, res) => {
             created_at: { $gte: startDate, $lte: endDate } // Filter by date range
         });
 
-        // Check if any costs were found for the user
-        if (!costs || costs.length === 0) {
-            return res.status(404).json({
-                error: 'User not found or no data available',
-                details: `No costs found for user ${userId} in ${monthNum}/${yearNum}`
-            });
-        }
-
         // Initialize an object to categorize costs
         const categories = {
             food: [],
