@@ -8,7 +8,8 @@
     "test:watch": "jest --watch",
     "test:coverage": "jest --coverage",
     "start": "node ./src/app.js",
-    "start:dev": "nodemon ./src/app.js"
+    "start:dev": "nodemon ./src/app.js",
+    "reset-db": "node src/resetDB.js"
   },
   "keywords": [],
   "author": "",

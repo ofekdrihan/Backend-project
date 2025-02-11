@@ -1,6 +1,7 @@
 /**
- * @fileoverview Defines the User model schema and exports the Mongoose model.
+ * @fileoverview Defines the User model schema and exports the Mongoose model for user management.
  * @module models/users
+ * @requires mongoose
  */
 import mongoose from "mongoose";
 
@@ -16,14 +17,15 @@ import mongoose from "mongoose";
 
 /**
  * Mongoose schema definition for users.
- * @type {mongoose.Schema}
+ * @type {mongoose.Schema<User>}
+ * @description Defines the structure and validation rules for user documents in MongoDB
  */
 const UserSchema = new mongoose.Schema({
-    id: { type: String, required: true, unique: true }, // Unique identifier for each user
+    id: { type: String, required: true, unique: true,trim:true }, // Unique identifier for each user
     first_name: { type: String, required: true }, // User's first name
     last_name: { type: String, required: true }, // User's last name
-    birthday: { type: Date, required: true }, // Date of birth in ISO format (YYYY-MM-DD)
-    marital_status: { type: String, required: true }, // Marital status (e.g., Single, Married, Divorced)
+    birthday: { type: Date, required: true,default:new Date('2001-1-01')}, // Date of birth in ISO format (YYYY-MM-DD)
+    marital_status: { type: String, required: true,default:'Single' }, // Marital status (e.g., Single, Married, Divorced)
     total: { type: Number, default: 0 }, // User's total balance, default value is 0
 });
 

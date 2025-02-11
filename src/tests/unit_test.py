@@ -2,6 +2,7 @@ import unittest
 import requests
 from datetime import datetime, timedelta
 
+
 class TestCostManagerAPI(unittest.TestCase):
     BASE_URL = "http://localhost:3000/api"
     TEST_USER_ID = "123123"
@@ -239,9 +240,11 @@ class TestCostManagerAPI(unittest.TestCase):
         )
         self.assertFalse(future_cost_present)
 
+
 def run_tests():
     """Run all tests"""
     unittest.main(argv=[''], verbosity=2)
+
 
 if __name__ == '__main__':
     run_tests()

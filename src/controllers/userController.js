@@ -48,39 +48,55 @@ export const getUserDetails = async (req, res) => {
  * @param {string} req.body.id - Unique identifier for the user
  * @param {string} req.body.first_name - User's first name
  * @param {string} req.body.last_name - User's last name
- * @param {string} req.body.birthday - User's date of birth (YYYY-MM-DD format)
- * @param {string} req.body.marital_status - User's marital status
+ * @param {string} [req.body.birthday] - Optional: User's date of birth (YYYY-MM-DD format)
+ * @param {string} [req.body.marital_status] - Optional: User's marital status
  * @param {import('express').Response} res - Express response object
  * @returns {Promise<import('express').Response>} Promise resolving to Express response
- * containing created user data or error message
  */
 export const createUser = async (req, res) => {
+    try {
   // Extract user details from request body
   const { id, first_name, last_name, birthday, marital_status } = req.body;
 
   // Check if all required fields are provided
-  if (!id || !first_name || !last_name || !birthday || !marital_status) {
-      return res.status(400).json({ error: 'Missing details!' });
-  }
+        if (!id || !first_name || !last_name) {
+            return res.status(400).json({
+                error: 'Missing required details! ID, first name, and last name are required.'
+            });
+        }
 
-  // Create a new user instance
-  const newUser = new User({
-      id,
-      first_name,
-      last_name,
-      birthday,
-      marital_status,
-      // total will default to 0 as defined in the schema
-  });
-
-  try {
-      // Save the user to the database
-      const savedUser = await newUser.save();
-      res.status(201).json(savedUser);
-  } catch (error) {
-      // Handle validation or other errors
-      res.status(400).json({ error: error.message });
-  }
+        // Create user object with only the required fields
+        const userFields = {
+            id,
+            first_name,
+            last_name
+        };
+        // Add optional fields if they exist and are valid
+        if (birthday) {
+            const birthdayDate = new Date(birthday);
+            if (!isNaN(birthdayDate.getTime())) {
+                userFields.birthday = birthdayDate;
+            }
+        }
+        if (marital_status) {
+            userFields.marital_status = marital_status;
+        }
+        // Create new user with defaults handling
+        const newUser = new User(userFields);
+        // Save the user
+        const savedUser = await newUser.save();
+        res.status(201).json(savedUser);
+    } catch (error) {
+        if (error.code === 11000) {
+            // Handle duplicate key error
+            return res.status(400).json({
+                error: 'User ID already exists'
+            });
+        }
+        res.status(400).json({
+            error: error.message
+        });
+    }
 };
 
 /**
