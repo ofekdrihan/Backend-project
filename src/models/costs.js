@@ -22,7 +22,7 @@ const CostSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true,
-        trim: true // Removes whitespace from both ends
+        trim: true // Removes whitespaces
     },
     // Category of the expense
     category: { 
