@@ -98,7 +98,12 @@ export const addCost = async (req, res) => {
  * @param {string} req.query.year - Year for the report
  * @param {string} req.query.month - Month for the report (1-12)
  * @param {import('express').Response} res - Express response object
- * @returns {Promise<import('express').Response>} Promise resolving to Express response
+ * @returns {Promise<import('express').Response>} Express response with one of the following:
+ *  - 200: Monthly cost report with categorized expenses
+ *  - 400: Error when required parameters are missing or invalid
+ *  - 404: Error when user is not found
+ *  - 500: Error when server encounters an internal error
+ * @throws {Error} When database operations fail
  */
 export const getReport = async (req, res) => {
     try {
@@ -124,6 +129,14 @@ export const getReport = async (req, res) => {
             });
         }
 
+        // First, check if user exists
+        const userExists = await User.findById(userId);
+        if (!userExists) {
+            return res.status(404).json({
+                error: 'User not found',
+                details: `User with ID ${userId} does not exist in the system`
+            });
+        }
         // Define the start and end dates for the requested month
         const startDate = new Date(yearNum, monthNum - 1, 1); // First day of the month
         const endDate = new Date(yearNum, monthNum, 0, 23, 59, 59, 999); // Last day of the month
