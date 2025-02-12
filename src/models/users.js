@@ -20,7 +20,7 @@ import mongoose from "mongoose";
  * @type {mongoose.Schema<User>}
  * @description Defines the structure and validation rules for user documents in MongoDB
  */
-const UserSchema = new mongoose.Schema({
+const userSchema = new mongoose.Schema({
     id: { type: String, required: true, unique: true,trim:true }, // Unique identifier for each user
     first_name: { type: String, required: true }, // User's first name
     last_name: { type: String, required: true }, // User's last name
@@ -33,6 +33,6 @@ const UserSchema = new mongoose.Schema({
  * User model for interacting with the "users" collection.
  * @type {mongoose.Model<User>}
  */
-const User = mongoose.model("users", UserSchema);
+const User = mongoose.model("users", userSchema);
 
 export default User;

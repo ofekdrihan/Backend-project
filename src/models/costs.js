@@ -17,7 +17,7 @@ import mongoose from "mongoose";
  * Mongoose schema definition for costs.
  * @type {mongoose.Schema}
  */
-const CostSchema = new mongoose.Schema({
+const costSchema = new mongoose.Schema({
     // Description of the expense
     description: {
         type: String,
@@ -40,6 +40,6 @@ const CostSchema = new mongoose.Schema({
  * Creates a Mongoose model for the "costs" collection.
  * @type {mongoose.Model<Cost>}
  */
-const Cost = mongoose.model("costs", CostSchema);
+const Cost = mongoose.model("costs", costSchema);
 
 export default Cost;
